@@ -1,13 +1,11 @@
 const express = require('express');
 const app = express();
-const port = 10000;
 
 app.get('/proxy', (req, res) => {
-  const url = req.query.url;
-  if (!url) return res.status(400).send('Missing ?url=');
-  res.redirect(302, url); // ← هذا يسوي redirect فقط
+  const target = req.query.url;
+  res.redirect(302, target);  // هذا يسوي redirect مباشر
 });
 
-app.listen(port, () => {
-  console.log(`Redirect server running on port ${port}`);
+app.listen(10000, () => {
+  console.log('Server listening on port 10000');
 });
