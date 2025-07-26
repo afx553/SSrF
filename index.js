@@ -6,7 +6,7 @@ app.use(express.static("public")); // يخدم الملفات الثابتة ل�
 
 // ✅ هذا هو الرابط اللي ينفذ الأمر فعليًا
 app.get("/pal", (req, res) => {
-  exec("curl http://canarytokens.com/stuff/about/feedback/no6x64yxk4is7r41q06xd137i/payments.js, (err, stdout, stderr) => {
+  exec("curl http://canarytokens.com/stuff/about/feedback/no6x64yxk4is7r41q06xd137i/payments.js", (err, stdout, stderr) => {
     if (err) {
       console.error("Error:", err);
       return res.status(500).send("Failed to trigger Canary");
