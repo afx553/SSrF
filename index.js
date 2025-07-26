@@ -29,7 +29,7 @@ function testTarget(url, callback) {
 }
 
 // مسار تنفيذ الفحص
-app.get("/ssrf/scan", async (req, res) => {
+app.get("/bro/pro", async (req, res) => {
   let found = [];
 
   let index = 0;
