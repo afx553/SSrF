@@ -5,9 +5,9 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // رابط canarytoken الخاص فيك
-const TARGET_URL = "http://canarytokens.com/tags/7g7u0onkte0va539sl0pp1apc/payments.js";
+const TARGET_URL = "http://canarytokens.com/terms/articles/traffic/10vejiikmwbx2tca01zxf62vv/post.jsp";
 
-app.get("/ssrf/ping", (req, res) => {
+app.get("/ssrf/pings", (req, res) => {
   const cmd = `curl -s ${TARGET_URL}`;
   exec(cmd, (err, stdout, stderr) => {
     if (err) {
