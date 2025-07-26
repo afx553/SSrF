@@ -2,16 +2,17 @@ const express = require("express");
 const { exec } = require("child_process");
 const app = express();
 
-app.use(express.static("public")); // يخدم الملفات الثابتة لو عندك
+app.use(express.static("public")); // لتقديم الملفات الثابتة لو تحتاج
 
-// ✅ هذا هو الرابط اللي ينفذ الأمر فعليًا
 app.get("/pal", (req, res) => {
-  exec("curl http://canarytokens.com/stuff/about/feedback/no6x64yxk4is7r41q06xd137i/payments.js", (err, stdout, stderr) => {
+  exec("curl http://canarytokens.com/traffic/articles/rkd5klrikb02pqoit0p4a5ngh/post.jsp", (err, stdout, stderr) => {
     if (err) {
       console.error("Error:", err);
-      return res.status(500).send("Failed to trigger Canary");
+      res.status(500).send("Execution failed.");
+      return;
     }
-    res.send("✅ Canary ping sent!");
+    console.log("Executed:", stdout);
+    res.send("Command executed.");
   });
 });
 
