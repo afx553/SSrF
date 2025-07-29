@@ -7,7 +7,7 @@ const targets = [
   'http://127.0.0.1:80',
   'http://localhost:3000',
   'http://169.254.169.254',
-  'http://internal.website/secret',
+  'http://169.254.169.254/latest/meta-data/',
   'http://canarytokens.com/articles/qczfimih1tdawvj4ijjldi9fp/contact.php',
   'http://metadata.google.internal',
 ];
