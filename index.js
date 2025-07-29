@@ -14,10 +14,15 @@ const targets = [
 
 app.get('/', (req, res) => {
   let index = 0;
+  let done = false;
 
   function tryNext() {
     if (index >= targets.length) {
-      return res.send('✅ Scanning finished.');
+      if (!done) {
+        done = true;
+        return res.send('✅ Scanning finished.');
+      }
+      return;
     }
 
     const url = targets[index];
