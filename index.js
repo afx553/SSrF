@@ -42,4 +42,7 @@ app.get('/ssrf/scan', (req, res) => {
   tryTargetsSequentially(TARGETS);
 });
 
-app.listen(PORT, ()
+app.listen(PORT, () => {
+  console.log(`🔥 Server running at http://localhost:${PORT}`);
+});
+
