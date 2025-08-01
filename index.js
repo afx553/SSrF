@@ -1,10 +1,14 @@
-# app.py
-from flask import Flask, request
-app = Flask(__name__)
+// index.js
+const express = require("express");
+const app = express();
+app.use(express.text({ type: "*/*" }));
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    print(f"[+] New Request from: {request.remote_addr}")
-    print(f"[+] Headers: {dict(request.headers)}")
-    print(f"[+] Body: {request.data.decode()}")
-    return "OK", 200
+app.all("*", (req, res) => {
+  console.log("[+] New request from:", req.ip);
+  console.log("[+] Headers:", req.headers);
+  console.log("[+] Body:", req.body);
+  res.send("Logged");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Server running on port", PORT));
